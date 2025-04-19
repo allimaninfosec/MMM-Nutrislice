@@ -6,5 +6,6 @@
 .MMM-Nutrislice {
     max-width: 400px;
     width: 100%; /* This ensures it uses 100% of the available space up to 400px */
-    margin: 0 auto; /* Center the content if the container is smaller than 400px */
+    /* Center the content if the container is smaller than 400px */
+    /*margin: 0 auto; */
 }
