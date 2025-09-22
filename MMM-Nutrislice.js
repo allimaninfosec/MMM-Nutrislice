@@ -1,8 +1,8 @@
 Module.register("MMM-Nutrislice", {
     // Default module config.
     defaults: {
-        district: "soudertonsd",
-        schoolName: "salford-hills-elementary-school",
+        district: "usd266",
+        schoolName: "maize-elementary",
         updateInterval: 3600000, // 1 hour
     },
 
