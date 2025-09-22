@@ -74,7 +74,7 @@ module.exports = NodeHelper.create({
 
             combinedMenus.push({
                 date: date,
-                combinedMenu: `<strong>Breakfast</strong>: ${breakfast}, <strong>Lunch</strong>: ${lunch}`
+                combinedMenu: `<strong>Breakfast</strong>: ${breakfast} </br> <strong>Lunch</strong>: ${lunch}`
             });
         });
 
