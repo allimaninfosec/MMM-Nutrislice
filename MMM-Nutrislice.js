@@ -53,7 +53,7 @@ Module.register("MMM-Nutrislice", {
 
         const header = document.createElement("header");
         header.className = "module-header";
-        header.innerHTML = "Today's School Menu";
+        header.innerHTML = "School Menu";
         wrapper.appendChild(header);
 
         if (!this.menuData) {
@@ -63,19 +63,35 @@ Module.register("MMM-Nutrislice", {
             return wrapper;
         }
 
-        const today = new Date().toISOString().split('T')[0];
-        const menu = this.menuData.find(menu => menu.date === today);
+        const todayDate = new Date();
+        const todayStr = todayDate.toISOString().split('T')[0];
 
-        if (menu) {
-            const dateElement = document.createElement("div");
-            dateElement.className = "menu-date";
-            dateElement.innerHTML = `${menu.combinedMenu}`;
-            wrapper.appendChild(dateElement);
-        } else {
-            const noMenuElement = document.createElement("div");
-            noMenuElement.innerHTML = "No menu available for today.";
-            wrapper.appendChild(noMenuElement);
-        }
+        const tomorrowDate = new Date();
+        tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+        const tomorrowStr = tomorrowDate.toISOString().split('T')[0];
+
+        const menuToday = this.menuData.find(menu => menu.date === todayStr);
+        const menuTomorrow = this.menuData.find(menu => menu.date === tomorrowStr);
+
+        const renderMenu = (menu, label, fallbackMsg) => {
+            const container = document.createElement("div");
+            container.className = "menu-day";
+
+            const title = document.createElement("div");
+            title.className = "menu-day-title";
+            title.innerHTML = label;
+            container.appendChild(title);
+
+            const content = document.createElement("div");
+            content.className = "menu-day-content";
+            content.innerHTML = menu ? menu.combinedMenu : fallbackMsg;
+            container.appendChild(content);
+
+            return container;
+        };
+
+        wrapper.appendChild(renderMenu(menuToday, "Today", "No menu available for today."));
+        wrapper.appendChild(renderMenu(menuTomorrow, "Tomorrow", "No menu available for tomorrow."));
 
         return wrapper;
     }
