@@ -4,6 +4,9 @@ Module.register("MMM-Nutrislice", {
         district: "usd266",
         schoolName: "maize-elementary",
         updateInterval: 3600000, // 1 hour
+        // Shift which day is considered "today" by hours. Use negative to show previous day,
+        // positive to show a later day. Default 0 = use local current time.
+        dateOffsetHours: -6,
     },
 
     start: function() {
@@ -19,10 +22,13 @@ Module.register("MMM-Nutrislice", {
     },
 
     getMenuData: function() {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
+        // Apply configured hour offset so the module can be nudged to a different local day
+        const offsetMs = (this.config.dateOffsetHours || 0) * 60 * 60 * 1000;
+        const effectiveDate = new Date(Date.now() + offsetMs);
+
+        const year = effectiveDate.getFullYear();
+        const month = String(effectiveDate.getMonth() + 1).padStart(2, '0');
+        const day = String(effectiveDate.getDate()).padStart(2, '0');
 
         const breakfastUrl = this.buildUrl("breakfast", year, month, day);
         const lunchUrl = this.buildUrl("lunch", year, month, day);
@@ -38,6 +44,11 @@ Module.register("MMM-Nutrislice", {
         const schoolName = this.config.schoolName;
 
         return `https://${district}.api.nutrislice.com/menu/api/weeks/school/${schoolName}/menu-type/${menuType}/${year}/${month}/${day}/`;
+    },
+
+    formatLocalDate: function(dateObj) {
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())}`;
     },
 
     socketNotificationReceived: function(notification, payload) {
@@ -63,12 +74,15 @@ Module.register("MMM-Nutrislice", {
             return wrapper;
         }
 
-        const todayDate = new Date();
-        const todayStr = todayDate.toISOString().split('T')[0];
+    // Use the configured offset so displayed day matches fetched data
+    const offsetMs = (this.config.dateOffsetHours || 0) * 60 * 60 * 1000;
+    const effectiveNow = new Date(Date.now() + offsetMs);
 
-        const tomorrowDate = new Date();
-        tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-        const tomorrowStr = tomorrowDate.toISOString().split('T')[0];
+    const todayStr = this.formatLocalDate(effectiveNow);
+
+    const tomorrowDate = new Date(effectiveNow);
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+    const tomorrowStr = this.formatLocalDate(tomorrowDate);
 
         const menuToday = this.menuData.find(menu => menu.date === todayStr);
         const menuTomorrow = this.menuData.find(menu => menu.date === tomorrowStr);
