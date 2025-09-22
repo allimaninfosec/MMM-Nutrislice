@@ -57,8 +57,20 @@ module.exports = NodeHelper.create({
         const allDates = Array.from(new Set([...Object.keys(breakfastItems), ...Object.keys(lunchItems)]));
 
         allDates.forEach(date => {
-            const breakfast = breakfastItems[date] ? breakfastItems[date].join(", ") : "None";
-            const lunch = lunchItems[date] ? lunchItems[date].join(", ") : "None";
+            const breakfastArr = breakfastItems[date] || [];
+            const lunchArr = lunchItems[date] || [];
+
+            // If both meals are missing or empty, it's likely a non-school day
+            if (breakfastArr.length === 0 && lunchArr.length === 0) {
+                combinedMenus.push({
+                    date: date,
+                    combinedMenu: "No School"
+                });
+                return;
+            }
+
+            const breakfast = breakfastArr.length ? breakfastArr.join(", ") : "None";
+            const lunch = lunchArr.length ? lunchArr.join(", ") : "None";
 
             combinedMenus.push({
                 date: date,
